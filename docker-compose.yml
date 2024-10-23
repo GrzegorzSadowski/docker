@@ -11,13 +11,15 @@ services:
   db:
     image: postgres:14.6
     environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /data/postgres
+    networks:
+      - springboot-network
     ports:
       - "5432:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the init.sql file
 
 
@@ -26,15 +28,19 @@ services:
     image: gsadowski69/gs-spring-boot-app
     depends_on:
       - db
-
+    networks:
+      - springboot-network
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mydb
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      DEVOPS: Grzegorz
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      DEVOPS: GrzegorzSad
     ports:
       - "8080:8080"
 
 volumes:
   db-data:
+
+networks:
+  springboot-network:
+    driver: bridge
