@@ -14,8 +14,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       PGDATA: /data/postgres
-    networks:
-      - springboot-network
     ports:
       - "5432:5432"
     volumes:
@@ -25,22 +23,16 @@ services:
 
   # Second image - Spring Boot application
   spring-app:
-    image: gsadowski69/gs-spring-boot-app
+    image: gsadowski69/gs-spring-boot-app:1
     depends_on:
       - db
-    networks:
-      - springboot-network
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      DEVOPS: GrzegorzSad
+      DEVOPS: GrzegorzSadowski
     ports:
       - "8080:8080"
 
-volumes:
-  db-data:
 
-networks:
-  springboot-network:
-    driver: bridge
+
