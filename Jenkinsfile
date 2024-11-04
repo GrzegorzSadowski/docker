@@ -16,14 +16,10 @@ pipeline {
     }
     post {
         success {
-            script {
-                githubNotify context: 'Jenkins', description: 'Build passed', status: 'SUCCESS'
-            }
+            setBuildStatus("Build succeeded", "SUCCESS");
         }
         failure {
-            script {
-                githubNotify context: 'Jenkins', description: 'Build failed', status: 'FAILURE'
-            }
+            setBuildStatus("Build failed", "FAILURE");
         }
-    }
+      }
 }
