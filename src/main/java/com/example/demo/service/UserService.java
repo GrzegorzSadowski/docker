@@ -4,7 +4,6 @@ import com.example.demo.entities.User;
 import com.example.demo.repository.UserRepository;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,7 +14,7 @@ public class UserService {
 
 
     public List<User> getAllUsers() {
-            return userRepository.findAll();
-        }
+        return userRepository.findAll();
+    }
 
 }
