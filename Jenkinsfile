@@ -1,49 +1,38 @@
 pipeline {
     agent any
 
+    triggers {
+        // Trigger this pipeline for each Pull Request (GitHub webhook needs to be set up)
+        pollSCM('* * * * *') // Alternatively, use GitHub webhook for triggering on PR
+    }
+
     environment {
-        // Define environment variables if needed
-        MAVEN_HOME = '/usr/share/maven' // Adjust if necessary
+        MAVEN_HOME = tool 'Maven'  // Assumes Maven is installed in Jenkins and set as "Maven" tool
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the source code from the Git repository
                 checkout scm
             }
         }
 
-        stage('Build') {
+        stage('Build and Test') {
             steps {
-                // Run Maven build
                 script {
-                    def mvnHome = tool name: 'Maven 3.x', type: 'maven'
-                    withEnv(["MAVEN_HOME=${mvnHome}"]) {
-                        sh "'${MAVEN_HOME}/bin/mvn' clean package"
+                    withMaven(maven: 'Maven') {  // Use configured Maven installation in Jenkins
+                        sh 'mvn clean test'
                     }
                 }
             }
         }
 
-        stage('Code Analysis') {
-            parallel {
-                stage('Checkstyle') {
-                    steps {
-                        // Run Checkstyle
-                        sh "'${MAVEN_HOME}/bin/mvn' checkstyle:check"
-                    }
-                }
-                stage('SpotBugs') {
-                    steps {
-                        // Run SpotBugs
-                        sh "'${MAVEN_HOME}/bin/mvn' spotbugs:check"
-                    }
-                }
-                stage('Dependency Check') {
-                    steps {
-                        // Run Dependency Check
-                        sh "'${MAVEN_HOME}/bin/mvn' dependency-check:check"
+        stage('Code Quality Checks') {
+            steps {
+                script {
+                    withMaven(maven: 'Maven') {
+                        // Run Checkstyle, SpotBugs, Dependency Check, or other checks here
+                        sh 'mvn checkstyle:check spotbugs:check'
                     }
                 }
             }
@@ -52,13 +41,14 @@ pipeline {
 
     post {
         always {
-            // Cleanup or notify actions can be added here
-            echo 'Pipeline finished.'
+            // Archive artifacts, for example, test reports
+            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            junit 'target/surefire-reports/*.xml'
         }
 
         failure {
-            // Actions to take if the pipeline fails
-            echo 'Build failed. Check the logs for errors.'
+            // Notify if the build fails (optional)
+            echo 'Build failed!'
         }
     }
 }
