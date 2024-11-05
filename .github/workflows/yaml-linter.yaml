@@ -2,9 +2,12 @@ name: YAML Lint for Spring Config
 
 on:
   pull_request:
+    branches:
+      - main  # or any branch you want to trigger on
     paths:
       - '**/*.yml'
       - '**/*.yaml'
+  workflow_dispatch:
 
 jobs:
   yaml-lint:
