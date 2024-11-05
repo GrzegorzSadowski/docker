@@ -1,13 +1,13 @@
+---
 name: YAML Lint for Spring Config
 
-on:
+"on":
   pull_request:
     branches:
       - master
     paths:
       - '**/*.yml'
       - '**/*.yaml'
-  workflow_dispatch:
 
 jobs:
   yaml-lint:
@@ -27,3 +27,4 @@ jobs:
 
       - name: Run yamllint
         run: yamllint . --strict
+
