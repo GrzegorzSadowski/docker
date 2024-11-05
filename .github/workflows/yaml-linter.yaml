@@ -1,0 +1,29 @@
+name: YAML Lint for Spring Config
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+  workflow_dispatch:
+
+jobs:
+  yaml-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Run yamllint
+        run: yamllint . --strict
