@@ -126,7 +126,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <failBuildOnCVSS>9</failBuildOnCVSS>
+                    <failBuildOnCVSS>8</failBuildOnCVSS>
                 </configuration>
             </plugin>
 
