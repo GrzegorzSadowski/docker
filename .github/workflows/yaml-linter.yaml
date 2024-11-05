@@ -3,7 +3,7 @@ name: YAML Lint for Spring Config
 on:
   pull_request:
     branches:
-      - main  # or any branch you want to trigger on
+      - master
     paths:
       - '**/*.yml'
       - '**/*.yaml'
