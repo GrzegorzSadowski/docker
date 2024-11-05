@@ -1,28 +1,32 @@
 pipeline {
     agent any
+
     tools {
-            maven 'M3'  // Use the name defined in Global Tool Configuration
-        }
+        maven 'M3' // Ensure the Maven version 'M3' is configured in Jenkins
+    }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building...'
-                sh 'mvn clean install' // This will build the project
+                checkout scm
             }
         }
-        stage('Test') {
+
+        stage('Build') {
             steps {
-                echo 'Running tests...'
-                sh 'mvn test' // Run all tests
+                script {
+                    try {
+                        // Run Maven build
+                        sh 'mvn clean install'
+                        // Notify GitHub of success
+                        githubNotify context: 'Build', status: 'SUCCESS', description: 'Build succeeded'
+                    } catch (e) {
+                        // Notify GitHub of failure
+                        githubNotify context: 'Build', status: 'FAILURE', description: 'Build failed'
+                        throw e // re-throw exception to mark pipeline as failed
+                    }
+                }
             }
         }
     }
-    post {
-        success {
-            setBuildStatus("Build succeeded", "SUCCESS");
-        }
-        failure {
-            setBuildStatus("Build failed", "FAILURE");
-        }
-      }
 }
