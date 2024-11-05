@@ -2,7 +2,11 @@ pipeline {
     agent any
 
     tools {
-        maven 'M3' // Ensure the Maven version 'M3' is configured in Jenkins
+        maven 'M3'  // Ensure Maven is configured in Jenkins
+    }
+
+    environment {
+        GITHUB_TOKEN = credentials('github-token') // GitHub token for authentication
     }
 
     stages {
@@ -15,18 +19,22 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    def commitSHA = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                     try {
-                        // Run Maven build
+                        // Set PR status to "Pending"
+                        githubPRStatusPublisher context: 'Jenkins Build', status: 'PENDING', message: 'Build in progress'
+
+                        // Perform Maven build
                         sh 'mvn clean install'
-                        // Notify GitHub of success
-                        githubNotify context: 'Build', status: 'SUCCESS', description: 'Build succeeded'
+
+                        // If build succeeds, set PR status to "Success"
+                        githubPRStatusPublisher context: 'Jenkins Build', status: 'SUCCESS', message: 'Build passed'
+
                     } catch (e) {
-                        // Notify GitHub of failure
-                        githubNotify context: 'Build', status: 'FAILURE', description: 'Build failed'
-                        throw e // re-throw exception to mark pipeline as failed
+                        // If build fails, set PR status to "Failure"
+                        githubPRStatusPublisher context: 'Jenkins Build', status: 'FAILURE', message: 'Build failed'
+                        throw e
                     }
                 }
             }
         }
-    }
-}
