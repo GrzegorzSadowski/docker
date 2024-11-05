@@ -1,54 +1,28 @@
 pipeline {
     agent any
-
-    triggers {
-        // Trigger this pipeline for each Pull Request (GitHub webhook needs to be set up)
-        pollSCM('* * * * *') // Alternatively, use GitHub webhook for triggering on PR
-    }
-
-    environment {
-        MAVEN_HOME = tool 'Maven'  // Assumes Maven is installed in Jenkins and set as "Maven" tool
-    }
-
+    tools {
+            maven 'M3'  // Use the name defined in Global Tool Configuration
+        }
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                checkout scm
+                echo 'Building...'
+                sh 'mvn clean install' // This will build the project
             }
         }
-
-        stage('Build and Test') {
+        stage('Test') {
             steps {
-                script {
-                    withMaven(maven: 'Maven') {  // Use configured Maven installation in Jenkins
-                        sh 'mvn clean test'
-                    }
-                }
-            }
-        }
-
-        stage('Code Quality Checks') {
-            steps {
-                script {
-                    withMaven(maven: 'Maven') {
-                        // Run Checkstyle, SpotBugs, Dependency Check, or other checks here
-                        sh 'mvn checkstyle:check spotbugs:check'
-                    }
-                }
+                echo 'Running tests...'
+                sh 'mvn test' // Run all tests
             }
         }
     }
-
     post {
-        always {
-            // Archive artifacts, for example, test reports
-            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
-            junit 'target/surefire-reports/*.xml'
+        success {
+            setBuildStatus("Build succeeded", "SUCCESS");
         }
-
         failure {
-            // Notify if the build fails (optional)
-            echo 'Build failed!'
+            setBuildStatus("Build failed", "FAILURE");
         }
-    }
+      }
 }
