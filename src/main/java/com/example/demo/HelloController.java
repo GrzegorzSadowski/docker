@@ -39,5 +39,4 @@ public class HelloController {
     public List<User> getAllPersons() {
         return userService.getAllUsers();
     }
-
 }

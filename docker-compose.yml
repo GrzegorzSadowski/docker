@@ -34,3 +34,7 @@ services:
       DEVOPS: GrzegorzSadowski
     ports:
       - "8080:8080"
+
+
+
+
