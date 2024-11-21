@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 public class UserService {
     private final UserRepository userRepository;
 
-    public List<User> getAllUsers() {
+
+
+    public List<User> getAllUsers()   {
         return userRepository.findAll();
     }
 
