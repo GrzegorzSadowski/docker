@@ -21,7 +21,6 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
-
   # Second image - Spring Boot application
   spring-app:
     image: gsadowski69/gs-spring-boot-app:1
